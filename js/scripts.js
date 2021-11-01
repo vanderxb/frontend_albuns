@@ -32,17 +32,25 @@ const getAlbuns = async () => {
     // a gente pega o resultado da api(um array de objetos com as vagas) e itera essa lista com o map
     // algo parecido com um for.
     albuns.map((album) => {
-        lista.insertAdjacentHTML('beforeend', `
+        if(album.status === false){
+            lista.insertAdjacentHTML('beforeend', `
         <div class="col-lg-4 mb-5 mb-lg-0">
             <div class="card">
                 <img src="${album.imagem}">
                 <div class="card-body">
                     <h2 class="h4 fw-bolder">${album.titulo}</h2>
-                    <h3 class="h4 fw-bolder">${album.artista}</h3>
+                    <h6>${album.artista}</h6>
                     <span class="badge bg-primary">${album.genero}</span>
                     <p class="card-text"> ${album.nota} &#9733; </p>
-                    <h2><i id="headphones" class="bi bi-headphones" style="color:${album.color}" onclick="putStatus('${album.id}')"></i></h2>
-                    
+                    <h2><i id="headphones" class="bi bi-headphones" style="color:${album.statuscolor}"></i></h2>
+                    <div>
+                        <input type="radio" onchange= "setFalse('${album.id}')" id="huey" name="${album.id}" value="false"
+                        checked>
+                        <label for="huey">Não Reproduzido</label>
+                        <input type="radio" onchange= "setTrue('${album.id}')"id="dewey" name="${album.id}" value="true">
+                        <label for="dewey">Reproduzido</label>
+                        
+                    </div>                    
                     <div>
                         <button class="btn btn-primary" onclick="editAlbum('${album.id}')">Editar</button>
                         <button class="btn btn-danger" onclick="deleteAlbum('${album.id}')">Excluir</button>
@@ -52,6 +60,35 @@ const getAlbuns = async () => {
         </div>
         
         `)
+        }else{
+            lista.insertAdjacentHTML('beforeend', `
+        <div class="col-lg-4 mb-5 mb-lg-0">
+            <div class="card">
+                <img src="${album.imagem}">
+                <div class="card-body">
+                    <h2 class="h4 fw-bolder">${album.titulo}</h2>
+                    <h6>${album.artista}</h6>
+                    <span class="badge bg-primary">${album.genero}</span>
+                    <p class="card-text"> ${album.nota} &#9733; </p>
+                    <h2><i id="headphones" class="bi bi-headphones" style="color:${album.statuscolor}" onclick="putStatus('${album.id}')"></i></h2>
+                    <div>
+                        <input type="radio" onchange= "setFalse('${album.id}')" id="huey" name="${album.id}" value="false"
+                        >
+                        <label for="huey">Não Reproduzido</label>
+                        <input type="radio" onchange= "setTrue('${album.id}')"id="dewey" name="${album.id}" value="true" checked>
+                        <label for="dewey">Reproduzido</label>
+                        
+                    </div>                    
+                    <div>
+                        <button class="btn btn-primary" onclick="editAlbum('${album.id}')">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteAlbum('${album.id}')">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        `)
+        }
     })
 }
 
@@ -180,9 +217,26 @@ const clearFields = () => {
     genero.value = '';
 }
 
-const putStatus = async(id) => {
+const setFalse = async(id) => {
     // estou construindo a requisicao para ser enviada para o backend.
-    const request = new Request(`${apiUrl}/status/${id}`, {
+    const status = false
+    const request = new Request(`${apiUrl}/${status}/${id}`, {
+        method:  'PUT'
+    })
+
+    // chamamos a funcao fetch de acordo com as nossa configuracaoes de requisicao.
+    const response = await fetch(request);
+    const result = await response.json();
+    // pego o objeto que vem do backend e exibo a msg de sucesso em um alerta.  
+
+    lista.innerHTML = '';
+    getAlbuns();
+}
+
+const setTrue = async(id) => {
+    // estou construindo a requisicao para ser enviada para o backend.
+    const status = true
+    const request = new Request(`${apiUrl}/${status}/${id}`, {
         method:  'PUT'
     })
 
